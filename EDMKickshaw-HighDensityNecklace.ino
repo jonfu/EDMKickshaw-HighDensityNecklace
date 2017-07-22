@@ -10,18 +10,18 @@
 //if STRIPSIZE is even, ARRAY_WIDTH = STRIPSIZE/2, else STRIPSIZE/2+1
 
 
-#define VCC 9
-#define PIN 4
-#define DATA_PIN 8
+#define VCC 12
+#define PIN 2 //dummy pin for neopixel library
+#define DATA_PIN 9
 #define CLOCK_PIN 10
-#define GND1 3
-#define GND2 2
+#define GND1 7
+//define GND2 2
 
 #define MAX_ALL_ON 12
 #define QUARTER_MAX 4
 
 
-const long interlude = 1; //default should be 20
+const long interlude = 5; //default should be 20
 const int totalInterludeMode = 5;
 const int maxColorWipe = 8;
 const int totalColorChase = 6;
@@ -34,12 +34,13 @@ const byte CHASEINTERVAL = 3;
 const byte THEATERINTERVAL = 25;
 const byte RAINBOWINTERVAL = 7;
 const byte WAVEINTERVAL = 10;
-const byte BRI_SCANNER = 20;
-const byte BRI_THEATER = 8;
-const byte BRI_RAINBOW = 10;
-const byte BRI_WIPE = 8;
-const byte BRI_WAVE = 8;
-const byte BRI_CHASE = 12;
+//with AA battery, double brightness
+const byte BRI_SCANNER = 40;
+const byte BRI_THEATER = 16;
+const byte BRI_RAINBOW = 20;
+const byte BRI_WIPE = 16;
+const byte BRI_WAVE = 16;
+const byte BRI_CHASE = 24;
 
 long count = 0;
 int interludeMode = 0;
@@ -81,7 +82,7 @@ CRGB leds[STRIPSIZE];
 #define LINEDELAYMICRO 500
 #define PATTERNDURATION 6000
 //#define NUM_LEDS 12
-#define BRI  5
+#define BRI  10 //AA
 
 //const byte ARMBAND_POV_OFFSET = (STRIPSIZE-NUM_LEDS)/2;
 
@@ -219,8 +220,12 @@ class NeoPatterns : public Adafruit_NeoPixel
                 
                     pinkCount++;
                     scannerIdx = pinkCount%PINKSIZE;
-                    
                     Color1 = Color(pinkArrayRed[scannerIdx],pinkArrayGreen[scannerIdx],pinkArrayBlue[scannerIdx]);
+
+                    pinkCount++;
+                    scannerIdx = pinkCount%PINKSIZE;
+                    Color2 = Color(pinkArrayRed[scannerIdx],pinkArrayGreen[scannerIdx],pinkArrayBlue[scannerIdx]);
+
                     count++;
                     if (count%interlude==0) {
                       enableInterlude = true;
@@ -439,12 +444,13 @@ class NeoPatterns : public Adafruit_NeoPixel
     }
     
     // Initialize for a SCANNNER
-    void Scanner(uint32_t color1, uint8_t interval)
+    void Scanner(uint32_t color1, uint32_t color2, uint8_t interval)
     {
         ActivePattern = SCANNER;
         Interval = interval;
         TotalSteps = (numPixels() - 1) * 2;
         Color1 = color1;
+        Color2 = color2;
         Index = 0;
         
         setBrightness(BRI_SCANNER);
@@ -477,7 +483,7 @@ class NeoPatterns : public Adafruit_NeoPixel
             }
             else if (i == TotalSteps - Index) // Scan Pixel to the left
             {
-                 setPixelColor(i, Color1);
+                 setPixelColor(i, Color2);
                  
                  /*
                  
@@ -693,11 +699,11 @@ void setup() {
       pinMode(GND1, OUTPUT);
       digitalWrite(GND1, LOW);  
       
-      pinMode(GND2, OUTPUT);
+//      pinMode(GND2, OUTPUT);
       pinMode(VCC, OUTPUT);
       pinMode(DATA_PIN, OUTPUT);
       pinMode(CLOCK_PIN, OUTPUT);
-      digitalWrite(GND2, LOW);
+//      digitalWrite(GND2, LOW);
       digitalWrite(VCC, HIGH);      
       
      FastLED.addLeds<APA102,DATA_PIN,CLOCK_PIN>(leds, STRIPSIZE);
@@ -720,7 +726,7 @@ void setup() {
 
       strip.begin();
       
-      strip.Scanner(strip.Color(pinkArrayRed[0],pinkArrayGreen[0],pinkArrayBlue[0]), SCANNERINTERVAL);  
+      strip.Scanner(strip.Color(pinkArrayRed[0],pinkArrayGreen[0],pinkArrayBlue[0]), strip.Color(pinkArrayRed[1],pinkArrayGreen[1],pinkArrayBlue[1]), SCANNERINTERVAL);  
      
      break;
      
@@ -828,8 +834,10 @@ void loop() {
     
     if (strip.ActivePattern != SCANNER) {
         pinkCount++;
-        int scannerIdx = pinkCount%PINKSIZE;
-        strip.Scanner(strip.Color(pinkArrayRed[scannerIdx],pinkArrayGreen[scannerIdx],pinkArrayBlue[scannerIdx]), SCANNERINTERVAL);
+        int scannerIdx1 = pinkCount%PINKSIZE;
+        pinkCount++;
+        int scannerIdx2 = pinkCount%PINKSIZE;        
+        strip.Scanner(strip.Color(pinkArrayRed[scannerIdx1],pinkArrayGreen[scannerIdx1],pinkArrayBlue[scannerIdx1]), strip.Color(pinkArrayRed[scannerIdx2],pinkArrayGreen[scannerIdx2],pinkArrayBlue[scannerIdx2]),SCANNERINTERVAL);
     }
     //strip.setBrightness(100);
     strip.Update();
@@ -899,6 +907,8 @@ void colorWipeReverse(uint32_t c, uint8_t wait) {
     delay(wait);
   }
 }
+
+/*
  
 void rainbow(uint8_t wait) {
 uint16_t i, j;
@@ -913,7 +923,7 @@ strip.show();
 delay(wait);
 }
 }
- 
+
 // Slightly different, this makes the rainbow equally distributed throughout
 void rainbowCycle(uint8_t wait) {
 uint16_t i, j;
@@ -928,6 +938,7 @@ strip.show();
 delay(wait);
 }
 }
+*/
  
 // Input a value 0 to 255 to get a color value.
 // The colours are a transition r - g - b - back to r.

@@ -1,5 +1,5 @@
 #define POVREPEAT 25
-#define OWLREPEAT 12
+#define OWLREPEAT 18
 
 // WIDTHowl1 48, array size 2976
 #define HEIGHTowl1 62
@@ -1945,11 +1945,16 @@ void displayOwls() {
 
 void displayPOVs() {
   
-  displayItem4bit(smile, smilePalette, HEIGHTsmile, POVREPEAT*2);
+
 //  displayItem4bit(loops, loopsPalette, HEIGHTloops, POVREPEAT*3);
   displayItem4bit(butterfly, butterflyPalette, HEIGHTbutterfly, POVREPEAT);
+  
+  displayItem4bit(smile, smilePalette, HEIGHTsmile, POVREPEAT*2);  
+  
+  displayItem4bit(zzrainbow, zzrainbowPalette, HEIGHTzzrainbow, POVREPEAT);  
+  
   displayItem4bit(hearts, heartsPalette, HEIGHThearts, POVREPEAT);
-  displayItem4bit(zzrainbow, zzrainbowPalette, HEIGHTzzrainbow, POVREPEAT);
+
 //  displayItem4bit(citynight, citynightPalette, HEIGHTcitynight, POVREPEAT);
 
   displayItem4bit(snowflakes, snowflakesPalette, HEIGHTsnowflakes, POVREPEAT);
